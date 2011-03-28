@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>CS411 - MiniJava Project</title>
+
+<style type="text/css">
+p, table, li, h1, h2, h3 {
+font-family: verdana,arial,'sans serif';
+}
+p, h1, h2, h3, table, li, hr {
+margin-left: 10pt;
+}
+body {
+}
+p, li {
+font-size: smaller;
+}
+pre {
+margin-left: 30pt;
+}
+</style></head>
+<body>
+<h1>CPSC 411 - Stage 5: Liveness Analysis</h1>
+<p>In
+this stage of the project we will implement the analyses from Chapter 10:</p><ol><li>Construction of a Flow graph.</li><li>Liveness analysis: compute the liveOut set for each node in the flow graph.</li><li>Construct
+an interference graph: use the flow graph and liveness info to create a
+graph that indicates which Temps can not be allocated to the same
+register.</li></ol><p>Liveness information is useful for many
+optimizations. However in our compiler we use it only to construct an
+interference graph which will be used in the next stage of our compiler
+(Project 6) to do register allocation (Since we are little bit behind schedule we are planning to provide you with
+register allocation).&nbsp;</p><h2>Project Setup</h2><p><span style="font-weight: bold; color: red;">Warning:</span>
+Before installing the new files, it is advisable to make a backup copy of
+your project. Otherwise you run the risk of overwriting any
+changes you have made to some of the files that were provided in earlier phases.</p><p>The
+zip file in which these instructions are contained is an archived copy
+of an Eclipse project. To import this project into Eclipse do as
+follows:</p><ol><li>Select "File &gt; Import" Menu.</li><li>Select "General &gt; Existing Projects into Workspace".</li><li>Select&nbsp;"Select Archive file" and Browse for this .zip file.</li><li>Select&nbsp;the project and click "Finish".</li></ol><p>The project is set up with a number of JUnit tests. The provided tests should be thought of&nbsp;as an <span style="font-weight: bold;">executable specification</span>. This means that<span style="font-weight: bold;"> you should not change any code in the test classes</span>.&nbsp;Otherwise
+you are free to change any and all code in the project. We also
+encourage you to create additional tests, to more thoroughly test your
+solution.</p><p>Test classes<span style="font-weight: bold;"><span style="font-weight: bold;"> </span></span>who's
+name contains the word "Internal" are an exception to the "don't change
+the tests" rule. These tests are intended to test a chunk of
+functionality that is "internal" to your solution.&nbsp; <span style="font-weight: bold;"><span style="font-weight: bold;"></span></span></p><p>The project contains the same files from the previous stage with the following new files:</p><ul><li><span style="font-weight: bold;">src</span></li><ul><li><span style="font-weight: bold;">minijava.test.analysis</span> Tests for this stage of the compiler.</li></ul><ul><li><span style="font-weight: bold;">minijava.analysis:&nbsp;</span>This package contains the code for this stage (and later on, in project 6) we will also add the code for register allocation).</li></ul><ul><ul><li><span style="font-weight: bold;">util:</span> This sub package contains some useful utility classes.</li><ul><li><span style="font-weight: bold;">graph: </span>An implementation of a data structure to represent a (directed) graph with nodes and edges.</li><li><span style="font-weight: bold;">ActiveSet.java</span>:
+A utility class that can be used to help solve data flow equations such
+as those for liveness analysis (see the example package or the lecture
+slides for examples).<span style="font-weight: bold;"></span></li></ul><li><span style="font-weight: bold;">implementation: </span>create this package and try to keep all your code confined to this package as much as possible.</li><li>other .java files: the "interfaces" for the different analyses in this compiler stage.</li></ul></ul></ul><h2>Inheritance</h2><p>The
+implementation of inheritance in MiniJava is optional. We may come back
+to this later if we have time to cover the material from Chapter 14 of
+the textbook. You may attempt to implement inheritance support if you like an extra challenge.</p><ul><ul><span style="font-family: verdana,arial,'sans serif';"></span></ul></ul>
+<h2>How to get started</h2><p>The
+tests for this part of the assignment are in minijava.test.analysis. You should work on them in the following order:</p><ol><li>TestFlowGraph.java</li><li>TestInternalLiveness.java</li><li>TestInterference.java</li></ol><p>The reason for this ordering is, of course, because each one depends on the result of the preceding ones.</p><p>The directory <span style="font-weight: bold;">sample_analysis_output</span>
+contains captured output from running some of the tests on my completed
+implementation. You can take a look at this if you want to get a rough
+idea of the kind of output that should be produced.</p><p>Things to read:</p><ul><li>Chapter 10 of the book.</li><li>The slides for Chapter 10.</li></ul><span style="font-family: verdana,arial,'sans serif';"></span><h2>Handing In</h2>
+<p>Only one of the team members should hand in for your team. <span style="font-weight: bold;">Make sure you have filled in the names of each team member in the src/README_stage5.txt file</span>. </p><p>The name of this project stage for the electronic handin is <b>
+project5</b>. Please use the <a href="http://www.cs.ubc.ca/ugrad/facilities/windows/handin.shtml">handin
+web-interface</a>.</p>
+<p>You should handin the entire contents of your project's src
+directory, excluding the test files. We have provided a <span style="font-weight: bold;">build.xml</span> script in the src directory that packages up the correct files in a .zip file. <span style="font-weight: bold;">Please use this script</span>, it will ensure a uniform layout for all handed in materials, which makes it easier for the TA.</p></body></html>

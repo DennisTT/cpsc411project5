@@ -1,0 +1,312 @@
+Translating program: 
+class Main {
+  public static void main(String[] args) { {
+      System.out.println(new Foo().doit(10));
+  } }
+}
+class Foo {
+    public int doit(int x) {
+      int result;
+      int count;
+      result = 0;
+      count = 1;
+      while (count<x) {
+          result = result + count;
+          count = count + 1;
+      }
+      return result;
+   }
+}
+VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+Fragments {
+   MethodFragment {
+      X86Frame { label = mj_main
+         nextLocalOffset = -4
+         formals = List {
+         }
+      }
+      trace scheduled IR:
+      List {
+         LABEL L_4
+         MOVE(
+            TEMP t0 <-
+            TEMP %ebx:%ebx)
+         MOVE(
+            TEMP t1 <-
+            TEMP %esi:%esi)
+         MOVE(
+            TEMP t2 <-
+            TEMP %edi:%edi)
+         MOVE(
+            TEMP t9 <-
+            CALL(
+               NAME(mj_new_object),
+               CONST 0))
+         MOVE(
+            TEMP t8 <-
+            CALL(
+               NAME(Foo_doit),
+               TEMP t9,
+               CONST 10))
+         EXP(CALL(
+            NAME(mj_println),
+            TEMP t8))
+         MOVE(
+            TEMP %ebx:%ebx <-
+            TEMP t0)
+         MOVE(
+            TEMP %esi:%esi <-
+            TEMP t1)
+         MOVE(
+            TEMP %edi:%edi <-
+            TEMP t2)
+         LABEL DONE_5
+      }
+   }
+   MethodFragment {
+      X86Frame { label = Foo_doit
+         nextLocalOffset = -4
+         formals = List {
+            8(%ebp)
+            12(%ebp)
+         }
+      }
+      trace scheduled IR:
+      List {
+         LABEL L_6
+         MOVE(
+            TEMP t5 <-
+            TEMP %ebx:%ebx)
+         MOVE(
+            TEMP t6 <-
+            TEMP %esi:%esi)
+         MOVE(
+            TEMP t7 <-
+            TEMP %edi:%edi)
+         MOVE(
+            TEMP t3 <-
+            CONST 0)
+         MOVE(
+            TEMP t4 <-
+            CONST 1)
+         LABEL L_3
+         CJUMP(LT,
+            TEMP t4,
+            MEM(BINOP(PLUS,
+               TEMP %ebp:%ebp, 
+               CONST 12)),
+            L_2, L_1)
+         LABEL L_1
+         MOVE(
+            TEMP %eax:%eax <-
+            TEMP t3)
+         MOVE(
+            TEMP %ebx:%ebx <-
+            TEMP t5)
+         MOVE(
+            TEMP %esi:%esi <-
+            TEMP t6)
+         MOVE(
+            TEMP %edi:%edi <-
+            TEMP t7)
+         JUMP(NAME(DONE_7))
+         LABEL L_2
+         MOVE(
+            TEMP t3 <-
+            BINOP(PLUS,
+               TEMP t3, 
+               TEMP t4))
+         MOVE(
+            TEMP t4 <-
+            BINOP(PLUS,
+               TEMP t4, 
+               CONST 1))
+         JUMP(NAME(L_3))
+         LABEL DONE_7
+      }
+   }
+}
+
+=================================
+Generating assembly for class Main {
+  public static void main(String[] args) { {
+      System.out.println(new Foo().doit(10));
+  } }
+}
+class Foo {
+    public int doit(int x) {
+      int result;
+      int count;
+      result = 0;
+      count = 1;
+      while (count<x) {
+          result = result + count;
+          count = count + 1;
+      }
+      return result;
+   }
+}
+flow graph for : mj_main
+0: <- ; goto 1                                    L_4:
+1: t0 <= %ebx ; goto 2                            movl    %ebx, t0
+2: t1 <= %esi ; goto 3                            movl    %esi, t1
+3: t2 <= %edi ; goto 4                            movl    %edi, t2
+4: t10 <- ; goto 5                                movl    $0, t10
+5: <- %esp t10 ; goto 6                           movl    t10, (%esp)
+6: %eax %ecx %edx <- %ebp %esp ; goto 7           call    mj_new_object
+7: t9 <= %eax ; goto 8                            movl    %eax, t9
+8: t11 <- ; goto 9                                movl    $10, t11
+9: <- %esp t11 ; goto 10                          movl    t11, 4(%esp)
+10: <- %esp t9 ; goto 11                          movl    t9, (%esp)
+11: %eax %ecx %edx <- %ebp %esp ; goto 12         call    Foo_doit
+12: t8 <= %eax ; goto 13                          movl    %eax, t8
+13: <- %esp t8 ; goto 14                          movl    t8, (%esp)
+14: %eax %ecx %edx <- %ebp %esp ; goto 15         call    mj_println
+15: %ebx <= t0 ; goto 16                          movl    t0, %ebx
+16: %esi <= t1 ; goto 17                          movl    t1, %esi
+17: %edi <= t2 ; goto 18                          movl    t2, %edi
+18: <- ; goto 19                                  DONE_5:
+19: <- %eax %ebp %esp %ebx %esi %edi ; goto       
+
+Liveness info: 
+0: <- ; goto 1                                    %ebp %esp %edi %esi %ebx 
+1: t0 <= %ebx ; goto 2                            %ebp %esp t0 %edi %esi 
+2: t1 <= %esi ; goto 3                            %ebp %esp t1 t0 %edi 
+3: t2 <= %edi ; goto 4                            %ebp %esp t2 t1 t0 
+4: t10 <- ; goto 5                                %ebp %esp t2 t1 t0 t10 
+5: <- %esp t10 ; goto 6                           %ebp %esp t2 t1 t0 
+6: %eax %ecx %edx <- %ebp %esp ; goto 7           %ebp %esp t2 t1 t0 %eax 
+7: t9 <= %eax ; goto 8                            %ebp %esp t2 t1 t0 t9 
+8: t11 <- ; goto 9                                %ebp %esp t2 t1 t0 t9 t11 
+9: <- %esp t11 ; goto 10                          %ebp %esp t2 t1 t0 t9 
+10: <- %esp t9 ; goto 11                          %ebp %esp t2 t1 t0 
+11: %eax %ecx %edx <- %ebp %esp ; goto 12         %ebp %esp t2 t1 t0 %eax 
+12: t8 <= %eax ; goto 13                          %ebp %esp t2 t1 t0 t8 
+13: <- %esp t8 ; goto 14                          %ebp %esp t2 t1 t0 
+14: %eax %ecx %edx <- %ebp %esp ; goto 15         %eax %ebp %esp t2 t1 t0 
+15: %ebx <= t0 ; goto 16                          %eax %ebp %esp %ebx t2 t1 
+16: %esi <= t1 ; goto 17                          %eax %ebp %esp %ebx %esi t2 
+17: %edi <= t2 ; goto 18                          %eax %ebp %esp %ebx %esi %edi 
+18: <- ; goto 19                                  %eax %ebp %esp %ebx %esi %edi 
+19: <- %eax %ebp %esp %ebx %esi %edi ; goto       
+
+Interference graph: 
+t0: t8 t11 t9 %edx %ecx %eax t10 t2 t1 %esi %edi %esp %ebp 
+%ebx: %edi %esi t1 t2 %esp %ebp %eax 
+%ebp: %edi %esi %ebx t8 t11 t9 %edx %ecx %eax t10 t2 t1 t0 
+%esp: %edi %esi %ebx t8 t11 t9 %edx %ecx %eax t10 t2 t1 t0 
+%edi: %esi %ebx %esp %ebp %eax t1 t0 
+%esi: %edi t2 %ebx %esp %ebp %eax t0 
+t1: %ebx t8 t11 t9 %edx %ecx %eax t10 t2 %edi t0 %esp %ebp 
+t2: %esi %ebx t8 t11 t9 %edx %ecx %eax t10 t0 t1 %esp %ebp 
+t10: t0 t1 t2 %esp %ebp 
+%eax: %edi %esi %ebx %edx %ecx t0 t1 t2 %esp %ebp 
+%ecx: %eax t0 t1 t2 %esp %ebp 
+%edx: %eax t0 t1 t2 %esp %ebp 
+t9: t11 t0 t1 t2 %esp %ebp 
+t11: t9 t0 t1 t2 %esp %ebp 
+t8: t0 t1 t2 %esp %ebp 
+MovesList {
+   t0 <= %ebx
+   t1 <= %esi
+   t2 <= %edi
+   t9 <= %eax
+   t8 <= %eax
+   %ebx <= t0
+   %esi <= t1
+   %edi <= t2
+}
+
+flow graph for : Foo_doit
+0: <- ; goto 1                                    L_6:
+1: t5 <= %ebx ; goto 2                            movl    %ebx, t5
+2: t6 <= %esi ; goto 3                            movl    %esi, t6
+3: t7 <= %edi ; goto 4                            movl    %edi, t7
+4: t12 <- ; goto 5                                movl    $0, t12
+5: t3 <= t12 ; goto 6                             movl    t12, t3
+6: t13 <- ; goto 7                                movl    $1, t13
+7: t4 <= t13 ; goto 8                             movl    t13, t4
+8: <- ; goto 9                                    L_3:
+9: t14 <- %ebp ; goto 10                          movl    12(%ebp), t14
+10: <- t4 t14 ; goto 11                           cmpl    t14, t4
+11: <- ; goto 12 18                               jl      L_2
+12: <- ; goto 13                                  L_1:
+13: %eax <= t3 ; goto 14                          movl    t3, %eax
+14: %ebx <= t5 ; goto 15                          movl    t5, %ebx
+15: %esi <= t6 ; goto 16                          movl    t6, %esi
+16: %edi <= t7 ; goto 17                          movl    t7, %edi
+17: <- ; goto 26                                  jmp     DONE_7
+18: <- ; goto 19                                  L_2:
+19: t15 <= t3 ; goto 20                           movl    t3, t15
+20: t15 <- t4 t15 ; goto 21                       addl    t4, t15
+21: t3 <= t15 ; goto 22                           movl    t15, t3
+22: t16 <= t4 ; goto 23                           movl    t4, t16
+23: t16 <- t16 ; goto 24                          incl    t16
+24: t4 <= t16 ; goto 25                           movl    t16, t4
+25: <- ; goto 8                                   jmp     L_3
+26: <- ; goto 27                                  DONE_7:
+27: <- %eax %ebp %esp %ebx %esi %edi ; goto       
+
+Liveness info: 
+0: <- ; goto 1                                    %ebp %esp %edi %esi %ebx 
+1: t5 <= %ebx ; goto 2                            %ebp %esp t5 %edi %esi 
+2: t6 <= %esi ; goto 3                            %ebp %esp t6 t5 %edi 
+3: t7 <= %edi ; goto 4                            %ebp %esp t7 t6 t5 
+4: t12 <- ; goto 5                                %ebp %esp t7 t6 t5 t12 
+5: t3 <= t12 ; goto 6                             %ebp %esp t7 t6 t5 t3 
+6: t13 <- ; goto 7                                %ebp %esp t7 t6 t5 t3 t13 
+7: t4 <= t13 ; goto 8                             t4 %ebp %esp t7 t6 t5 t3 
+8: <- ; goto 9                                    t4 %ebp %esp t7 t6 t5 t3 
+9: t14 <- %ebp ; goto 10                          t4 %ebp %esp t7 t6 t5 t3 t14 
+10: <- t4 t14 ; goto 11                           t4 %ebp %esp t7 t6 t5 t3 
+11: <- ; goto 12 18                               t4 %ebp %esp t7 t6 t5 t3 
+12: <- ; goto 13                                  %ebp %esp t7 t6 t5 t3 
+13: %eax <= t3 ; goto 14                          %eax %ebp %esp t7 t6 t5 
+14: %ebx <= t5 ; goto 15                          %eax %ebp %esp %ebx t7 t6 
+15: %esi <= t6 ; goto 16                          %eax %ebp %esp %ebx %esi t7 
+16: %edi <= t7 ; goto 17                          %eax %ebp %esp %ebx %esi %edi 
+17: <- ; goto 26                                  %eax %ebp %esp %ebx %esi %edi 
+18: <- ; goto 19                                  %ebp %esp t7 t6 t5 t4 t3 
+19: t15 <= t3 ; goto 20                           %ebp %esp t7 t6 t5 t4 t15 
+20: t15 <- t4 t15 ; goto 21                       %ebp %esp t7 t6 t5 t4 t15 
+21: t3 <= t15 ; goto 22                           %ebp %esp t7 t6 t5 t3 t4 
+22: t16 <= t4 ; goto 23                           %ebp %esp t7 t6 t5 t3 t16 
+23: t16 <- t16 ; goto 24                          %ebp %esp t7 t6 t5 t3 t16 
+24: t4 <= t16 ; goto 25                           t4 %ebp %esp t7 t6 t5 t3 
+25: <- ; goto 8                                   t4 %ebp %esp t7 t6 t5 t3 
+26: <- ; goto 27                                  %eax %ebp %esp %ebx %esi %edi 
+27: <- %eax %ebp %esp %ebx %esi %edi ; goto       
+
+Interference graph: 
+t5: t16 t15 %eax t14 t4 t13 t3 t12 t7 t6 %esi %edi %esp %ebp 
+%ebx: %edi %esi t6 t7 %esp %ebp %eax 
+%ebp: t16 t15 %edi %esi %ebx %eax t14 t4 t13 t3 t12 t7 t6 t5 
+%esp: t16 t15 %edi %esi %ebx %eax t14 t4 t13 t3 t12 t7 t6 t5 
+%edi: %esi %ebx %esp %ebp %eax t6 t5 
+%esi: %edi t7 %ebx %esp %ebp %eax t5 
+t6: t16 t15 %ebx %eax t14 t4 t13 t3 t12 t7 %edi t5 %esp %ebp 
+t7: t16 t15 %esi %ebx %eax t14 t4 t13 t3 t12 t5 t6 %esp %ebp 
+t12: t5 t6 t7 %esp %ebp 
+t3: t16 t14 t4 t13 t5 t6 t7 %esp %ebp 
+t13: t3 t5 t6 t7 %esp %ebp 
+t4: t15 t14 t3 t5 t6 t7 %esp %ebp 
+t14: t3 t5 t6 t7 %esp %ebp t4 
+%eax: %edi %esi %ebx t5 t6 t7 %esp %ebp 
+t15: t4 t5 t6 t7 %esp %ebp 
+t16: t3 t5 t6 t7 %esp %ebp 
+MovesList {
+   t5 <= %ebx
+   t6 <= %esi
+   t7 <= %edi
+   t3 <= t12
+   t4 <= t13
+   %eax <= t3
+   %ebx <= t5
+   %esi <= t6
+   %edi <= t7
+   t15 <= t3
+   t3 <= t15
+   t16 <= t4
+   t4 <= t16
+}
+
