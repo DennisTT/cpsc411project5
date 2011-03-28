@@ -1,0 +1,553 @@
+options
+{
+  static = false;
+}
+
+// -----------------------------------------------------------------------------
+
+PARSER_BEGIN(JCCMiniJavaParser)
+package minijava.parser.jcc;
+
+import java.util.ArrayList;
+import minijava.ast.*;
+
+public class JCCMiniJavaParser {}
+
+PARSER_END(JCCMiniJavaParser)
+
+// -----------------------------------------------------------------------------
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| < "//" (~["\n", "\r"])* ("\n" | "\r")? > // Single-line comment
+| "/*": IN_COMMENT // Starred comment - change to special IN_COMMENT state
+}
+
+// In a starred comment - characters to skip and return back to default state
+// Based on: http://www.engr.mun.ca/~theo/JavaCC-FAQ/javacc-faq-moz.htm#tth_sEc3.10
+< IN_COMMENT > SKIP :{  < ~[] >       // Skip all characters while in starred comment.| "*/": DEFAULT // Skip ending characters and exit starred comment state}
+
+// -----------------------------------------------------------------------------
+
+TOKEN : /* KEYWORDS */
+{
+  < CLASS   : "class" >
+| < PUBLIC  : "public" >
+| < STATIC  : "static" >
+| < VOID    : "void" >
+| < MAIN    : "main" >
+| < STRING  : "String" >
+| < EXTENDS : "extends" >
+| < RETURN  : "return" >
+| < IF      : "if" >
+| < ELSE    : "else" >
+| < WHILE   : "while" >
+| < TRUE    : "true" >
+| < FALSE   : "false" >
+| < THIS    : "this" >
+| < NEW     : "new" >
+| < LENGTH  : "length" >
+}
+
+// -----------------------------------------------------------------------------
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS      : "+" >
+| < MINUS     : "-" >
+| < MULTIPLY  : "*" >
+| < DIVIDE    : "/" >
+| < EQUAL     : "=" >
+| < AND       : "&&" >
+| < LESS_THAN : "<" >
+| < DOT       : "." >
+| < NOT       : "!" >
+}
+
+// -----------------------------------------------------------------------------
+
+TOKEN : /* SEPARATORS */
+{
+  < LPAR      : "(" >
+| < RPAR      : ")" >
+| < LBRACK    : "[" >
+| < RBRACK    : "]" >
+| < LBRACE    : "{" >
+| < RBRACE    : "}" >
+| < COMMA     : "," >
+| < SEMICOLON : ";" >
+}
+
+// -----------------------------------------------------------------------------
+
+TOKEN : /* METHODS */
+{
+  < PRINTLN : "System.out.println" >
+}
+
+// -----------------------------------------------------------------------------
+
+TOKEN :
+{
+  < TYPE_INT       : "int" >
+| < TYPE_BOOLEAN   : "boolean" >
+| < CONSTANT       : (< DIGIT >)+ >
+| < IDENTIFIER     : < LETTER > (< LETTER > | < DIGIT > | "_")* >
+| < #DIGIT         : [ "0"-"9" ] >
+| < #LETTER        : [ "a"-"z", "A"-"Z" ] >
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for an entire MiniJava source file
+Program Program() :
+{
+  MainClass             mainClass;
+  ClassDecl             c;
+  ArrayList<ClassDecl>  otherClasses = new ArrayList<ClassDecl>();
+}
+{
+  mainClass = Main()
+  ( c       = ClassDeclaration() { otherClasses.add(c); } )*
+              < EOF >
+  { return new Program(mainClass, new NodeList<ClassDecl>(otherClasses)); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for the MiniJava main class
+MainClass Main() :
+{
+  Token     className,
+            argName;
+  Statement s;
+}
+{
+              < CLASS >
+  className = < IDENTIFIER >
+              < LBRACE >
+              < PUBLIC >
+              < STATIC >
+              < VOID >
+              < MAIN >
+              < LPAR >
+              < STRING >
+              < LBRACK >
+              < RBRACK >
+  argName   = < IDENTIFIER >
+              < RPAR >
+              < LBRACE >
+  s         = Statement()
+              < RBRACE >
+              < RBRACE >
+  { return new MainClass(className.image, argName.image, s); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava class
+ClassDecl ClassDeclaration() :
+{
+  Token                 name,
+                        superName = null;
+  VarDecl               v;
+  MethodDecl            m;
+  ArrayList<VarDecl>    vars      = new ArrayList<VarDecl>();
+  ArrayList<MethodDecl> methods   = new ArrayList<MethodDecl>();
+}
+{
+  < CLASS >
+  name = < IDENTIFIER >
+  (
+    < EXTENDS >
+    superName = < IDENTIFIER >
+  )?
+  < LBRACE >
+  (
+    v = VarDeclaration(VarDecl.Kind.FIELD)    { vars.add(v); }
+  | m = MethodDeclaration() { methods.add(m); }
+  )*
+  < RBRACE >
+  { return new ClassDecl( name.image,
+                          (superName != null) ? superName.image : null,
+                          new NodeList<VarDecl>(vars),
+                          new NodeList<MethodDecl>(methods)); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava variable declaration
+VarDecl VarDeclaration(VarDecl.Kind kind) :
+{
+  Type  type;
+  Token id;
+}
+{
+  type  = Type()
+  id    = < IDENTIFIER >
+          < SEMICOLON >
+  { return new VarDecl(kind, type, id.image); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava method declaration
+MethodDecl MethodDeclaration() :
+{
+  Type                  returnType;
+  Token                 id;
+  VarDecl               varDecl;
+  Statement             s;
+  ArrayList<VarDecl>    formals     = new ArrayList<VarDecl>();
+  ArrayList<VarDecl>    vars        = new ArrayList<VarDecl>();
+  ArrayList<Statement>  statements  = new ArrayList<Statement>();
+  Expression            returnExp;
+}
+{
+                < PUBLIC >
+  returnType  = Type()
+  id          = < IDENTIFIER >
+                < LPAR >
+  formals     = FormalList()
+                < RPAR >
+                < LBRACE >
+  (
+    LOOKAHEAD(2)
+    varDecl   = VarDeclaration(VarDecl.Kind.LOCAL)
+                // Adding each local variable declaration to a list to
+                // be passed into MethodDecl constructor
+                { vars.add(varDecl); }
+                    
+  )*
+  (
+    LOOKAHEAD(2)
+    s         = Statement()
+                // Adding each statement declaration to a list to
+                // be passed into MethodDecl constructor
+                { statements.add(s); }
+  )*
+                < RETURN >
+  returnExp   = Expression()
+                < SEMICOLON >
+                < RBRACE >
+  { return new MethodDecl(returnType,
+                          id.image,
+                          formals,
+                          vars,
+                          statements,
+                          returnExp); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for an argument list in a MiniJava method
+ArrayList<VarDecl> FormalList() :
+{
+  Type                t;
+  Token               id;
+  ArrayList<VarDecl>  formals = new ArrayList<VarDecl>();
+}
+{
+  (
+    // First formal
+    t     = Type()
+    id    = < IDENTIFIER >
+            { formals.add(new VarDecl(VarDecl.Kind.FORMAL, t, id.image)); }
+
+    // Rest of formals
+    (
+            < COMMA >
+      t   = Type()
+      id  = < IDENTIFIER >
+            { formals.add(new VarDecl(VarDecl.Kind.FORMAL, t, id.image)); }
+    )*
+  )?
+  { return formals; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava statement
+Statement Statement() :
+{
+  Token                 name;
+  Expression            e1,
+                        e2;
+  Statement             s1,
+                        s2;
+  ArrayList<Statement>  statements = new ArrayList<Statement>();
+}
+{
+  // Statement block
+          < LBRACE >
+  ( s1  = Statement() { statements.add(s1); } )*
+          < RBRACE >
+  { return new Block(new NodeList<Statement>(statements)); }
+  
+| // If statement
+        < IF >
+        < LPAR >
+  e1  = Expression()
+        < RPAR >
+  s1  = Statement()
+        < ELSE >
+  s2  = Statement()
+  { return new If(e1, s1, s2); }
+  
+| // While statement
+        < WHILE >
+        < LPAR >
+  e1  = Expression()
+        < RPAR >
+  s1  = Statement()
+  { return new While(e1, s1); }
+  
+| // Println statement
+        < PRINTLN >
+        < LPAR >
+  e1  = Expression()
+        < RPAR >
+        < SEMICOLON >
+  { return new Print(e1); }
+  
+| // Assignment statement
+  LOOKAHEAD(2)
+  name  = < IDENTIFIER >
+          < EQUAL >
+  e1    = Expression()
+          < SEMICOLON >
+  { return new Assign(name.image, e1); }
+  
+| // Array assignment statement
+  name  = < IDENTIFIER >
+          < LBRACK >
+  e1    = Expression()
+          < RBRACK >
+          < EQUAL >
+  e2    = Expression()
+          < SEMICOLON >
+  { return new ArrayAssign(name.image, e1, e2); }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava expression
+// Operator precedence (low to high): &&, <, +/-, *, !, []/.
+// And Expressions
+Expression Expression() :
+{
+  Expression e1,
+             e2;
+}
+{
+  e1 = LessThanExpr()
+  (
+         < AND >
+    e2 = LessThanExpr()
+    { e1 = new And(e1, e2); }
+  )*
+  { return e1; }
+}
+
+// -----------------------------------------------------------------------------
+
+// LessThan expressions
+// Helper method for Expression()
+Expression LessThanExpr() :
+{
+  Expression e1,
+             e2;
+}
+{
+  e1 = AddMinusExpr()
+  (
+         < LESS_THAN >
+    e2 = AddMinusExpr()
+    { e1 = new LessThan(e1, e2); }
+  )*
+  { return e1; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Add/Minus expressions
+// Helper method for Expression()
+Expression AddMinusExpr() :
+{  Expression e1,
+             e2;
+}
+{  e1 = MultExpr()
+  (
+         < PLUS >
+    e2 = MultExpr()
+    { e1 = new Plus(e1, e2); }
+  |      < MINUS >
+    e2 = MultExpr()
+    { e1 = new Minus(e1, e2); }
+  )*
+  { return e1; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Times expressions
+// Helper method for Expression()
+Expression MultExpr() :
+{  Expression e1,
+             e2;
+}
+{  e1 = NotExpr()
+  (         < MULTIPLY >
+    e2 = NotExpr()
+    { e1 = new Times(e1, e2); }
+  )*
+  { return e1; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Not expressions
+// Helper method for Expression()
+Expression NotExpr() :
+{  Expression e;
+  int numNots = 0;
+}
+{  (
+    < NOT >
+    { numNots++; } // Count the number of nots
+  )*
+  e = AccessorExpr()
+  {
+    // Wrap the expression with the counted number of nots
+    for(int i = 0; i < numNots; i++)
+    {      e = new Not(e);
+    }
+    return e;
+  }
+}
+// -----------------------------------------------------------------------------
+
+// Accessor expressions
+// Helper method for Expression()
+Expression AccessorExpr() :
+{
+  Expression  e1,
+              e2;
+}
+{
+  e1 = BasicExpr()
+  (
+    e1 = AccessorExprTail(e1)
+  )*
+  { return e1; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a basic expression
+// Helper method for Expression()
+Expression BasicExpr() :
+{
+  Token       id;
+  Expression  e;
+}
+{ // Integer literal
+  id  = < CONSTANT >   { return new IntegerLiteral(id.image); }
+  
+| // Boolean literals
+        < TRUE >       { return new BooleanLiteral(true); }
+|       < FALSE >      { return new BooleanLiteral(false); }
+
+| // Identifier
+  id  = < IDENTIFIER > { return new IdentifierExp(id.image); }
+  
+| // This
+        < THIS >       { return new This(); }
+  
+| // Array
+  LOOKAHEAD(2)
+        < NEW >
+        < TYPE_INT >
+        < LBRACK >
+  e   = Expression()
+        < RBRACK >
+  { return new NewArray(e); }
+  
+| // Object
+        < NEW >
+  id  = < IDENTIFIER >
+        < LPAR >
+        < RPAR >
+  { return new NewObject(id.image); }
+  
+| // Parenthesized expression
+        < LPAR >
+  e     = Expression()
+        < RPAR >
+  { return e; }
+}
+
+// -----------------------------------------------------------------------------
+
+// Array access ([]), field/method access (.)
+// Helper method for Expression()
+Expression AccessorExprTail(Expression e) :
+{
+  Token                 id;
+  Expression            e1,
+                        e2;
+  ArrayList<Expression> rands = new ArrayList<Expression>();
+}
+{
+        < LBRACK >
+  e1  = Expression()
+        < RBRACK >
+  { return new ArrayLookup(e, e1); }
+| LOOKAHEAD(2)
+  < DOT >
+  (
+    < LENGTH >
+    { return new ArrayLength(e); }
+  |
+    id  = < IDENTIFIER >
+          < LPAR >
+          (
+            e1 = Expression()
+            { rands.add(e1); }
+            (
+              < COMMA >
+              e2 = Expression()
+              { rands.add(e2); }
+            )*
+          )?
+          < RPAR >
+    { return new Call(e, id.image, new NodeList<Expression>(rands)); }
+  )
+}
+
+// -----------------------------------------------------------------------------
+
+// Builds an APT for a MiniJava type
+Type Type() :
+{ Token t; }
+{
+  // Integer
+  t = < TYPE_INT >
+      (
+        // Integer Array
+        < LBRACK >
+        < RBRACK >
+        { return new IntArrayType(); }
+      )?
+      { return new IntegerType(); }
+      
+| // Boolean
+  t = < TYPE_BOOLEAN >  { return new BooleanType(); }
+  
+| // Object
+  t = < IDENTIFIER >    { return new ObjectType(t.image); }
+}

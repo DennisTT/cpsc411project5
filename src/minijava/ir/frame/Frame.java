@@ -45,6 +45,9 @@ public abstract class Frame extends DefaultIndentable {
 	 */
 	public abstract Access allocLocal(boolean escapes);
 	
+	// Helper method to create an Access instance
+	public abstract Access alloc(int offset);
+	
 	///////////////////////////////////////////////////////////////////
 	/// Chapter 7 additions: (for translation to IR phase)
 
