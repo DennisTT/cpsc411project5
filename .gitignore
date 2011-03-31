@@ -1,0 +1,4 @@
+bin
+src/minijava/parser/jcc/*.java
+*.class
+.settings
