@@ -97,7 +97,7 @@ public class X86Muncher extends Muncher
         // Save current registers to frame
         for(int i = 0; i < r.size(); ++i)
         {
-          m.emit(new A_OPER("pushl    `s0", null, list(r.get(i))));
+          m.emit(new A_OPER("pushl    `s0", noTemps, list(r.get(i))));
         }
         
         // Add arguments to frame in reverse order
@@ -260,7 +260,7 @@ public class X86Muncher extends Muncher
         }
         
         // Include jump instruction for when the condition is true
-        m.emit(new A_OPER(j + "    `j0", null, null, list(l)));
+        m.emit(new A_OPER(j + "    `j0", noTemps, noTemps, list(l)));
         
         // Include fall-through jump instruction for when the condition is false
         m.emit(A_JUMP(c.get(_m_)));
@@ -326,7 +326,7 @@ public class X86Muncher extends Muncher
   
   private static Instr A_JUMP(Label l)
   {
-    return new A_OPER("jmp     `j0", null, null, list(l));
+    return new A_OPER("jmp     `j0", noTemps, noTemps, list(l));
   }
   
   /**

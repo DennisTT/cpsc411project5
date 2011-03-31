@@ -142,7 +142,8 @@ public class X86Frame extends Frame {
   @Override
   public List<Instr> procEntryExit2(List<Instr> asmBody)
   {
-    return asmBody.append(List.list((Instr) new A_OPER("", null, returnSink)));
+    List<Temp> noTemps = List.empty();
+    return asmBody.append(List.list((Instr) new A_OPER("", noTemps, returnSink)));
   }
 
   @Override
