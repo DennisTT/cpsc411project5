@@ -101,7 +101,8 @@ public class CJUMP extends IRStm {
 			return l.isEQ(r)?iffalse:iftrue;
 		case EQ:
 			return l.isEQ(r)?iftrue:iffalse;
-
+		case GE:
+		  return r.isLT(l)?iftrue:iffalse;
 		default:
 			throw new Error("Missing case? "+relop);
 		}
