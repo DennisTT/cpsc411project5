@@ -21,7 +21,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
     while(itr.hasNext())
     {
       Instr i = itr.next();
-      this.table.put(new Node<Instr>(this, i), i);
+      this.table.put(this.nodeFor(i), i);
     }
   }
 
