@@ -316,12 +316,12 @@ public class X86Muncher extends Muncher
   
   private static Instr A_LABEL(Label l)
   {
-    return new A_LABEL(l.toString() + ":\n", l);
+    return new A_LABEL(l.toString() + ":", l);
   }
   
   private static Instr A_CALL(Label l)
   {
-    return new A_OPER("call    " + l.toString() + "\n", noTemps, noTemps);
+    return new A_OPER("call    " + l.toString(), noTemps, noTemps);
   }
   
   private static Instr A_JUMP(Label l)
