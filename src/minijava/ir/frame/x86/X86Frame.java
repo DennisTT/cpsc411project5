@@ -23,15 +23,15 @@ public class X86Frame extends Frame {
   
   public static X86Frame factory = new X86Frame(null, null);
   
-  private static Temp eax = new Temp("eax"),
-                      ebp = new Temp("ebp"),
-                      ebx = new Temp("ebx"),
-                      ecx = new Temp("ecx"),
-                      edi = new Temp("edi"),
-                      edx = new Temp("edx"),
-                      eip = new Temp("eip"),
-                      esi = new Temp("esi"),
-                      esp = new Temp("esp");
+  private static Temp eax = new Temp("%eax"),
+                      ebp = new Temp("%ebp"),
+                      ebx = new Temp("%ebx"),
+                      ecx = new Temp("%ecx"),
+                      edi = new Temp("%edi"),
+                      edx = new Temp("%edx"),
+                      eip = new Temp("%eip"),
+                      esi = new Temp("%esi"),
+                      esp = new Temp("%esp");
   
   private static List<Temp> returnSink = List.list(eax, ebp, esp, ebx, esi, edi);
   
