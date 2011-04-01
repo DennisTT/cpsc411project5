@@ -17,11 +17,22 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   
   public AssemFlowGraph(List<Instr> body)
   {
+    Node<Instr> n,
+                prevNode = null;
+    
     Iterator<Instr> itr = body.iterator();
     while(itr.hasNext())
     {
       Instr i = itr.next();
-      this.table.put(this.nodeFor(i), i);
+      n = this.nodeFor(i);
+      this.table.put(n, i);
+      
+      if(prevNode != null)
+      {
+        this.addEdge(prevNode, n);
+      }
+      
+      prevNode = n;
     }
   }
 
