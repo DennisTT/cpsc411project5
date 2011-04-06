@@ -1,7 +1,10 @@
 package minijava.analysis.implementation;
 
+import java.io.StringWriter;
+
 import minijava.analysis.InterferenceGraph;
 import minijava.codegen.assem.A_MOVE;
+import minijava.util.IndentingWriter;
 import minijava.util.List;
 
 public class InterferenceGraphImplementation extends InterferenceGraph
@@ -17,6 +20,13 @@ public class InterferenceGraphImplementation extends InterferenceGraph
   public List<Move> moves()
   {
     return moves;
+  }
+  
+  public String toString() {
+    StringWriter out = new StringWriter();
+    this.dump(new IndentingWriter(out));
+    moves.dump(new IndentingWriter(out));
+    return out.toString();
   }
 
 }
