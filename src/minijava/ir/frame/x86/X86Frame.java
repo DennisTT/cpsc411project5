@@ -160,6 +160,22 @@ public class X86Frame extends Frame {
     return List.list(eax, ebp, ebx, ecx, edi, edx, eip, esi, esp);
   }
 
+  /**
+   * A list of registers that the callee must preserve.
+   */
+  public List<Temp> calleeSaves()
+  {
+    return List.list(ebp, esp);
+  }
+
+  /**
+   * A list of registers that the caller must preserve.
+   */
+  public List<Temp> callerSaves()
+  {
+    return List.list(eax, ecx, edx);
+  }
+  
   @Override
   public void entrySequence(IndentingWriter out)
   {

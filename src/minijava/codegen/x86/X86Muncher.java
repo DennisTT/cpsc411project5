@@ -12,6 +12,7 @@ import minijava.codegen.muncher.MuncherRules;
 import minijava.codegen.patterns.Matched;
 import minijava.codegen.patterns.Pat;
 import minijava.ir.frame.Frame;
+import minijava.ir.frame.x86.X86Frame;
 import minijava.ir.temp.Label;
 import minijava.ir.temp.Temp;
 import minijava.ir.tree.CJUMP.RelOp;
@@ -101,7 +102,7 @@ public class X86Muncher extends Muncher
           m.emit(A_MOV(m.munch(f.getOutArg(length - i).exp(f.FP())), m.munch(args.get(i))));
         }
         
-        m.emit(A_CALL(name));
+        m.emit(A_CALL(name, (X86Frame) f));
         
         return m.munch(f.RV());
       }
@@ -312,9 +313,9 @@ public class X86Muncher extends Muncher
     return new A_LABEL(l.toString() + ":", l);
   }
   
-  private static Instr A_CALL(Label l)
+  private static Instr A_CALL(Label l, X86Frame f)
   {
-    return new A_OPER("call    " + l.toString(), noTemps, noTemps);
+    return new A_OPER("call    " + l.toString(), f.callerSaves(), f.calleeSaves());
   }
   
   private static Instr A_JUMP(Label l)
