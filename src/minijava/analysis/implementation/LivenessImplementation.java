@@ -11,8 +11,8 @@ import minijava.util.List;
 
 public class LivenessImplementation<N> extends Liveness<N>
 {
-  HashMap<Node<N>, HashSet<Temp>> liveIn;
-  HashMap<Node<N>, HashSet<Temp>> liveOut;
+  private HashMap<Node<N>, HashSet<Temp>> liveIn;
+  private HashMap<Node<N>, HashSet<Temp>> liveOut;
   
   public LivenessImplementation(FlowGraph<N> graph)
   {
