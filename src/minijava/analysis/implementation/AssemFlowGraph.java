@@ -65,7 +65,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   public boolean isMove(Node<Instr> node)
   {
     Instr i = this.table.get(node);
-    return (i != null) && (i instanceof A_MOVE);
+    return (i != null) && ((i instanceof A_MOVE) || (i.format().startsWith("movl")));
   }
 
   @Override
@@ -77,8 +77,8 @@ public class AssemFlowGraph extends FlowGraph<Instr>
     for(Node<Instr> node : this.nodes())
     {
       // Special treatment for MOVE instructions
-      if(node.wrappee() instanceof A_MOVE)
-      {        
+      if(isMove(node) && node.wrappee() instanceof A_MOVE)
+      {
         // Record a move
         ig.addMove((A_MOVE) node.wrappee());
       }
@@ -87,7 +87,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
       {
         for(Temp out : live.liveOut(node))
         {
-          if(!(node.wrappee() instanceof A_MOVE))
+          if(!isMove(node) || !(node.wrappee() instanceof A_MOVE))
           {
             // Not a MOVE instruction
             
@@ -119,7 +119,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
             Temp mvDst = ((A_MOVE) node.wrappee()).dst;
             
             // For move nodes, add interference edges that are not (s, t) for s -> t moves
-            if(!mvDst.equals(def) && !mvSrc.equals(out) && !def.equals(out))
+            if(!(mvDst.equals(def) && mvSrc.equals(out)) && !def.equals(out))
             {
               ig.addEdge(ig.nodeFor(def), ig.nodeFor(out));
               ig.addEdge(ig.nodeFor(out), ig.nodeFor(def));
