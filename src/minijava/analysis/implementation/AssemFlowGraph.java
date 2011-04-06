@@ -13,9 +13,7 @@ import minijava.ir.temp.Temp;
 import minijava.util.List;
 
 public class AssemFlowGraph extends FlowGraph<Instr>
-{
-  private HashMap<Node<Instr>, Instr> table = new HashMap<Node<Instr>, Instr>();
-  
+{  
   public AssemFlowGraph(List<Instr> body)
   {
     Node<Instr> n,
@@ -26,7 +24,6 @@ public class AssemFlowGraph extends FlowGraph<Instr>
     {
       Instr i = itr.next();
       n = this.nodeFor(i);
-      this.table.put(n, i);
       
       if(prevNode != null)
       {
@@ -40,7 +37,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   @Override
   public List<Temp> def(Node<Instr> node)
   {
-    Instr i = this.table.get(node);
+    Instr i = node.wrappee();
     if(i == null)
     {
       return null;
@@ -52,7 +49,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   @Override
   public List<Temp> use(Node<Instr> node)
   {
-    Instr i = this.table.get(node);
+    Instr i = node.wrappee();
     if(i == null)
     {
       return null;
@@ -64,7 +61,7 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   @Override
   public boolean isMove(Node<Instr> node)
   {
-    Instr i = this.table.get(node);
+    Instr i = node.wrappee();
     return (i != null) 
             && ((i instanceof A_MOVE) 
                 || ((i.format().startsWith("movl"))
