@@ -410,10 +410,11 @@ public class X86Muncher extends Muncher
   
   ///////// Helper methods to generate X86 assembly instructions //////////////////////////////////////
   
-  private static Instr A_ADD(Temp reg, int i) {
-    return new A_OPER("addl    $"+i+", `d0", 
-        list(reg),
-        list(reg));
+  private static Instr A_ADD(Temp reg, int i)
+  {
+    // Optimize instruction when incrementing by 1
+    return (i != 1) ? new A_OPER("addl    $"+i+", `d0", list(reg), list(reg)) :
+                      new A_OPER("incl    `d0", list(reg), list(reg));
   }
   
   private static Instr A_ADD(Temp d, Temp s) {
