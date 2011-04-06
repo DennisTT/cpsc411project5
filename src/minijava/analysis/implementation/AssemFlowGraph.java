@@ -1,6 +1,5 @@
 package minijava.analysis.implementation;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import minijava.analysis.FlowGraph;
