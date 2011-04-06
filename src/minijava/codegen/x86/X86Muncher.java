@@ -276,34 +276,34 @@ public class X86Muncher extends Muncher
         String j = null;
         
         // Include instruction for determining jump condition flag
-        m.emit(A_SUB(m.munch(c.get(_f_)), m.munch(c.get(_e_))));
+        m.emit(A_CMP(m.munch(c.get(_f_)), m.munch(c.get(_e_))));
         
         switch(c.get(_op_))
         {
           case EQ:
           {
-            j = "je";
+            j = "je ";
           }
           case GE:
           {
-            j = "jge";
+            j = "jge ";
           }
           case GT:
           {
-            j = "jg";
+            j = "jg ";
           }
           case LE:
           {
-            j = "jle";
+            j = "jle ";
           }
           case LT:
           {
-            j = "jl";
+            j = "jl  ";
             break;
           }
           case NE:
           {
-            j = "jne";
+            j = "jne ";
             break;
           }
         }
@@ -311,8 +311,6 @@ public class X86Muncher extends Muncher
         // Include jump instruction for when the condition is true
         m.emit(new A_OPER(j + "    `j0", noTemps, noTemps, list(l)));
         
-        // Include fall-through jump instruction for when the condition is false
-        m.emit(A_JUMP(c.get(_m_)));
         return null;
       }
     });
@@ -342,6 +340,11 @@ public class X86Muncher extends Muncher
     return new A_OPER("imul    `s0, `d0", 
         list(d),
         list(s));
+  }
+  
+  private static Instr A_CMP(Temp t1, Temp t2)
+  {
+    return new A_OPER("cmpl    `s0, `s1", noTemps, list(t1, t2));
   }
   
   private static Instr A_MOV(Temp d, Temp s) {
