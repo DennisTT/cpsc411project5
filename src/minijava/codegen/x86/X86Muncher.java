@@ -192,17 +192,24 @@ public class X86Muncher extends Muncher
         int offset = 0;
         IRExp l = c.get(_e_),
               r = c.get(_f_);
+        Temp d;
         
         if(l instanceof CONST)
         {
+          d = m.munch(r);
           offset = ((CONST) l).getValue();
-          m.emit(A_MEM_WRITE(m.munch(r), m.munch(c.get(_g_)), offset));
         }
-        else if(r instanceof CONST)
+        else
         {
-          offset = ((CONST) r).getValue();
-          m.emit(A_MEM_WRITE(m.munch(l), m.munch(c.get(_g_)), offset));
+          d = m.munch(l);
+          
+          if(r instanceof CONST)
+          {
+            offset = ((CONST) r).getValue();
+          }
         }
+        
+        m.emit(A_MEM_WRITE(d, m.munch(c.get(_g_)), offset));
         
         return null;
       }
@@ -218,18 +225,25 @@ public class X86Muncher extends Muncher
         int offset = 0;
         IRExp l = c.get(_e_),
               r = c.get(_f_);
+        Temp d;
         
         if(l instanceof CONST)
         {
-          offset -= ((CONST) l).getValue();
+          d = m.munch(r);
+          offset = ((CONST) l).getValue();
         }
-        
-        if(r instanceof CONST)
+        else
         {
-          offset -= ((CONST) r).getValue();
+          d = m.munch(l);
+          
+          if(r instanceof CONST)
+          {
+            offset = ((CONST) r).getValue();
+          }
         }
         
-        m.emit(A_MEM_WRITE(m.munch(c.get(_f_)), m.munch(c.get(_g_)), offset));
+        m.emit(A_MEM_WRITE(d, m.munch(c.get(_g_)), -offset));
+        
         return null;
       }
     });
