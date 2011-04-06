@@ -37,36 +37,28 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   @Override
   public List<Temp> def(Node<Instr> node)
   {
-    Instr i = node.wrappee();
-    if(i == null)
-    {
-      return null;
-    }
-    
-    return i.def();
+    return node.wrappee().def();
   }
 
   @Override
   public List<Temp> use(Node<Instr> node)
   {
-    Instr i = node.wrappee();
-    if(i == null)
-    {
-      return null;
-    }
-    
-    return i.use();
+    return node.wrappee().use();
   }
 
   @Override
   public boolean isMove(Node<Instr> node)
   {
     Instr i = node.wrappee();
-    return (i != null) 
-            && ((i instanceof A_MOVE) 
-                || ((i.format().startsWith("movl")
-                    && !i.use().isEmpty()
-                    && !i.def().isEmpty())));
+    
+    // Moves are only A_MOVEs from temp->temp
+    // and movl A_OPERs from temp->temp
+    return ((i instanceof A_MOVE
+              && i.format().indexOf("(") < 0)
+            || ((i.format().startsWith("movl")
+                && i.format().indexOf("(") < 0
+                && !i.use().isEmpty()
+                && !i.def().isEmpty())));
   }
 
   @Override
