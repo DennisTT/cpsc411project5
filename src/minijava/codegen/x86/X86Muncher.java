@@ -55,12 +55,20 @@ public class X86Muncher extends Muncher
     final Pat<List<IRExp>>  _es_  = Pat.any();
     final Pat<RelOp>        _op_  = Pat.any();
     
-    // An example of a Stm muncher rule:
-    sm.add(new MunchRule<IRStm, Void>( MOVE(TEMP(_t_), _e_) ) {
+    sm.add(new MunchRule<IRStm, Void>( MOVE(TEMP(_t_), _e_) )
+    {
       @Override
-      protected Void trigger(Muncher m, Matched c) {
-        m.emit(A_MOV( c.get(_t_),
-                  m.munch(c.get(_e_)) ));
+      protected Void trigger(Muncher m, Matched c)
+      {
+        Temp  d = c.get(_t_),
+              s = m.munch(c.get(_e_));
+        
+        // Only generate move instruction if source and destination are different
+        if(!d.equals(s))
+        {
+          m.emit(A_MOV(d, s));
+        }
+        
         return null;
       }
     });
