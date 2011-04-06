@@ -92,13 +92,6 @@ public class X86Muncher extends Muncher
         Label name = c.get(_l_);
         List<IRExp> args = c.get(_es_);
         Frame f = m.getFrame();
-        List<Temp> r = f.registers();
-        
-        // Save current registers to frame
-        for(int i = 0; i < r.size(); ++i)
-        {
-          m.emit(new A_OPER("pushl    `s0", noTemps, list(r.get(i))));
-        }
         
         // Add arguments to frame in reverse order
         int length = args.size();
