@@ -195,15 +195,15 @@ public class X86Muncher extends Muncher
         
         if(l instanceof CONST)
         {
-          offset += ((CONST) l).getValue();
+          offset = ((CONST) l).getValue();
+          m.emit(A_MEM_WRITE(m.munch(r), m.munch(c.get(_g_)), offset));
         }
-        
-        if(r instanceof CONST)
+        else if(r instanceof CONST)
         {
-          offset += ((CONST) r).getValue();
+          offset = ((CONST) r).getValue();
+          m.emit(A_MEM_WRITE(m.munch(l), m.munch(c.get(_g_)), offset));
         }
         
-        m.emit(A_MEM_WRITE(m.munch(c.get(_f_)), m.munch(c.get(_g_)), offset));
         return null;
       }
     });
@@ -350,17 +350,17 @@ public class X86Muncher extends Muncher
   
   private static Instr A_MOV_CONST(Temp reg, int c)
   {
-    return new A_OPER("movl    $" + c + ", `d0", list(reg), list(reg));
+    return new A_OPER("movl    $" + c + ", `d0", list(reg), noTemps);
   }
   
   private static Instr A_MEM_WRITE(Temp d, Temp s)
   {
-    return new A_MOVE("movl    `s0, (`d0)", d, s);
+    return new A_OPER("movl    `s0, (`s1)", noTemps, list(s, d));
   }
   
   private static Instr A_MEM_WRITE(Temp d, Temp s, int offset)
   {
-    return (offset > 0) ? new A_MOVE("movl    `s0, " + offset + "(`d0)", d, s) :
+    return (offset > 0) ? new A_OPER("movl    `s0, " + offset + "(`s1)", noTemps, list(s, d)) :
                           A_MEM_WRITE(d, s);
   }
   
