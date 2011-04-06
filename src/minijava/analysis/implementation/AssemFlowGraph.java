@@ -64,8 +64,9 @@ public class AssemFlowGraph extends FlowGraph<Instr>
     Instr i = node.wrappee();
     return (i != null) 
             && ((i instanceof A_MOVE) 
-                || ((i.format().startsWith("movl"))
-                    && !i.use().isEmpty()));
+                || ((i.format().startsWith("movl")
+                    && !i.use().isEmpty()
+                    && !i.def().isEmpty())));
   }
 
   @Override
