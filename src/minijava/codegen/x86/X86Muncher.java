@@ -462,12 +462,12 @@ public class X86Muncher extends Muncher
   
   private static Instr A_MEM_READ(Temp d, Temp s)
   {
-    return new A_MOVE("movl    (`s0), `d0", d, s);
+    return new A_OPER("movl    (`s0), `d0", list(d), list(s));
   }
   
   private static Instr A_MEM_READ(Temp d, Temp s, int offset)
   {
-    return (offset > 0) ? new A_MOVE("movl    " + offset + "(`s0), `d0", d, s) :
+    return (offset > 0) ? new A_OPER("movl    " + offset + "(`s0), `d0", list(d), list(s)) :
                           A_MEM_READ(d, s);
   }
   
