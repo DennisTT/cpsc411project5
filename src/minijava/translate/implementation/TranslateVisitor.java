@@ -389,7 +389,7 @@ public class TranslateVisitor implements Visitor<TranslateExp>
   {
     int   wordSize  = this.frames.peek().wordSize(),
           length    = this.symbols.numClassVars(n.typeName),
-          s         = (length + 1) * wordSize;
+          s         = length * wordSize;
     IRExp r         = IR.TEMP(new Temp()),
           c         = IR.CALL(Translator.L_NEW_OBJECT, List.list(IR.CONST(s)));
     IRStm seq       = IR.MOVE(r, c);
