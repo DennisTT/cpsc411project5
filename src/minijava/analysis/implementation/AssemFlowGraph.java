@@ -65,7 +65,10 @@ public class AssemFlowGraph extends FlowGraph<Instr>
   public boolean isMove(Node<Instr> node)
   {
     Instr i = this.table.get(node);
-    return (i != null) && ((i instanceof A_MOVE) || (i.format().startsWith("movl")));
+    return (i != null) 
+            && ((i instanceof A_MOVE) 
+                || ((i.format().startsWith("movl"))
+                    && !i.use().isEmpty()));
   }
 
   @Override
